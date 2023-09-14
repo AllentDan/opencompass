@@ -4,7 +4,6 @@ import random
 import re
 import time
 from concurrent.futures import ThreadPoolExecutor
-from random import random
 from threading import Lock
 from typing import Dict, List, Optional, Union
 

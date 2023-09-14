@@ -19,8 +19,8 @@ api_meta_template = dict(
 )
 
 models = [
-    dict(abbr='qwen-7b',
-        type=RestfulAPI, path='qwen-7b',
+    dict(abbr='llama2',
+        type=RestfulAPI, path='llama2',
         key='ENV',  # The key will be obtained from $OPENAI_API_KEY, but you can write down your key here as well
         meta_template=api_meta_template,
         query_per_second=1,

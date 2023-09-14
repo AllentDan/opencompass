@@ -1,9 +1,10 @@
 import json
 import os
-from random import random
+import random
 import re
 import time
 from concurrent.futures import ThreadPoolExecutor
+from random import random
 from threading import Lock
 from typing import Dict, List, Optional, Union
 
@@ -12,13 +13,12 @@ import requests
 
 from opencompass.registry import MODELS
 from opencompass.utils.prompt import PromptList
-import random
 
 from .base_api import BaseAPIModel
 
 PromptType = Union[PromptList, str]
 OPENAI_API_BASE = 'http://10.140.24.140:1234/generate'
-EMBEDDING_URL='http://10.140.24.140:1234/v1/embeddings'
+EMBEDDING_URL = 'http://10.140.24.140:1234/v1/embeddings'
 
 
 @MODELS.register_module()
@@ -215,14 +215,12 @@ class RestfulAPI(BaseAPIModel):
                 header['OpenAI-Organization'] = self.orgs[self.org_ctr]
 
             try:
-                data = dict(
-                    prompt=messages,
-                    instance_id=random.randint(1, 10000),
-                    sequence_start=True,
-                    sequence_end=True,
-                    request_output_len=max_out_len,
-                    temperature=temperature
-                )
+                data = dict(prompt=messages,
+                            instance_id=random.randint(1, 10000),
+                            sequence_start=True,
+                            sequence_end=True,
+                            request_output_len=max_out_len,
+                            temperature=temperature)
                 raw_response = requests.post(self.url,
                                              headers=header,
                                              data=json.dumps(data))
@@ -267,13 +265,18 @@ class RestfulAPI(BaseAPIModel):
             int: Length of the input tokens
         """
         embeddings = requests.post(self.embedding_url,
-                                             headers={},
-                                             data=json.dumps({
-                "model": self.path,
-                "input": prompt,
-                "user": "string"
-                }))
-        token_len = embeddings.json()['usage']['prompt_tokens']
+                                   headers={},
+                                   data=json.dumps({
+                                       'model': self.path,
+                                       'input': prompt,
+                                       'user': 'string'
+                                   }))
+        try:
+            embeddings = embeddings.json()
+        except requests.JSONDecodeError:
+            self.logger.error('JsonDecode error, got', str(embeddings.content))
+            return -1
+        token_len = embeddings['usage']['prompt_tokens']
         return token_len
 
     def bin_trim(self, prompt: str, num_token: int) -> str:
